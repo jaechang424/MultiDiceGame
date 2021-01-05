@@ -1,0 +1,11 @@
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\bin\Debug\MultiDiceGame.exe.config
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\bin\Debug\MultiDiceGame.exe
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\bin\Debug\MultiDiceGame.pdb
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.csprojAssemblyReference.cache
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.FormMain.resources
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.Properties.Resources.resources
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.csproj.GenerateResource.cache
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.csproj.CoreCompileInputs.cache
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.exe
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.pdb
+D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.FormGame.resources
