@@ -9,3 +9,13 @@ D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.cspr
 D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.exe
 D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.pdb
 D:\Gitter\MultyDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.FormGame.resources
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\bin\Debug\MultiDiceGame.exe.config
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\bin\Debug\MultiDiceGame.exe
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\bin\Debug\MultiDiceGame.pdb
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.csprojAssemblyReference.cache
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.FormMain.resources
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.FormGame.resources
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.Properties.Resources.resources
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.csproj.GenerateResource.cache
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.exe
+E:\Git\MultiDiceGame\MultiDiceGame\MultiDiceGame\obj\Debug\MultiDiceGame.pdb

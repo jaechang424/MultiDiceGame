@@ -14,7 +14,7 @@ namespace MultiDiceGame
 
         static Game()
         {
-            Map = new int[16][];
+            Map = new int[14][];
             for (int i = 0; i < Map.Length; i++)
             {
                 Map[i] = new int[16];
