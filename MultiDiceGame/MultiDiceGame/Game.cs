@@ -11,10 +11,12 @@ namespace MultiDiceGame
     {
         public static int[][] Map { get; set; }
         public static int PlayerCount { get; set; } = 2;
+        public static int RollVal { get; set; }
+        public static bool IsRolling { get; set; }
 
         static Game()
         {
-            Map = new int[14][];
+            Map = new int[13][];
             for (int i = 0; i < Map.Length; i++)
             {
                 Map[i] = new int[16];

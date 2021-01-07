@@ -13,7 +13,9 @@ namespace MultiDiceGame
     public partial class FormGame : Form
     {
         Player iPlayer, uPlayer;
-        int sz = 50; // 공간크기
+        Bitmap[] diceImg;
+        int sz = 55; // 공간크기
+        Timer rollDiceTimer;
         public FormGame()
         {
             InitializeComponent();
@@ -23,10 +25,15 @@ namespace MultiDiceGame
         {
             iPlayer = new Player();
             uPlayer = new Player();
-            Timer t_order = new Timer();
+            diceImg = new Bitmap[6];
+            for (int i = 0; i < diceImg.Length; i++)
+            {
+                diceImg[i] = new Bitmap($@"Image/주사위{i + 1}.png");
+            }
+            /*Timer t_order = new Timer();
             t_order.Interval = 2000;
             t_order.Tick += t_order_Tick;
-            t_order.Start();
+            t_order.Start();*/
         }
 
         private void t_order_Tick(object sender, EventArgs e)
@@ -39,6 +46,31 @@ namespace MultiDiceGame
         {
             //Owner.Show();
             Owner.Dispose();
+        }
+
+        private void btn_rollDice_Click(object sender, EventArgs e)
+        {
+            btn_rollDice.Enabled = false;
+            rollDiceTimer = new Timer();
+            rollDiceTimer.Tick += RollDiceTimer_Tick;
+            rollDiceTimer.Interval = 100;
+            rollDiceTimer.Start();
+        }
+
+        private void RollDiceTimer_Tick(object sender, EventArgs e)
+        {
+            if (Game.RollVal < 20)
+            {
+                Game.RollVal++;
+                Random rand = new Random();
+                pbox_dice.Image = diceImg[rand.Next(6)];
+            }
+            else
+            {
+                Game.RollVal = 0;
+                rollDiceTimer.Stop();
+                btn_rollDice.Enabled = true;
+            }
         }
 
         private void FormGame_Paint(object sender, PaintEventArgs e)
