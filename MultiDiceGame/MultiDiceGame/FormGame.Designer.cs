@@ -41,7 +41,7 @@ namespace MultiDiceGame
             this.btn_rollDice.FlatAppearance.BorderSize = 2;
             this.btn_rollDice.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_rollDice.Font = new System.Drawing.Font("Times New Roman", 20.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btn_rollDice.Location = new System.Drawing.Point(1012, 425);
+            this.btn_rollDice.Location = new System.Drawing.Point(1088, 532);
             this.btn_rollDice.Name = "btn_rollDice";
             this.btn_rollDice.Size = new System.Drawing.Size(110, 86);
             this.btn_rollDice.TabIndex = 0;
@@ -52,7 +52,7 @@ namespace MultiDiceGame
             // pbox_dice
             // 
             this.pbox_dice.BackColor = System.Drawing.SystemColors.Control;
-            this.pbox_dice.Location = new System.Drawing.Point(1008, 544);
+            this.pbox_dice.Location = new System.Drawing.Point(1084, 651);
             this.pbox_dice.Name = "pbox_dice";
             this.pbox_dice.Size = new System.Drawing.Size(120, 120);
             this.pbox_dice.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
@@ -63,7 +63,7 @@ namespace MultiDiceGame
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1184, 801);
+            this.ClientSize = new System.Drawing.Size(1264, 861);
             this.Controls.Add(this.pbox_dice);
             this.Controls.Add(this.btn_rollDice);
             this.DoubleBuffered = true;

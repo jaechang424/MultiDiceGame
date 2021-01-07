@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MultiDiceGame
 {
+    public enum Directions { Left, Right }
     class Player
     {
-        public Point CharPos { get; set; }
-        public int MotionValue { get; set; }
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int MotionValue { get; set; }     
+        public Directions Direction { get; set; }
+        public bool IsShortPath { get; set; }
+
+        public Player()
+        {
+            X = 0;
+            Y = 12;
+            Direction = Directions.Right;
+        }
     }
 }

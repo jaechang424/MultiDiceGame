@@ -13,9 +13,8 @@ namespace MultiDiceGame
     public partial class FormGame : Form
     {
         Player iPlayer, uPlayer;
-        Bitmap[] diceImg;
-        int sz = 55; // 공간크기
-        Timer rollDiceTimer;
+        Timer rollDiceTimer, moveCharTimer;
+
         public FormGame()
         {
             InitializeComponent();
@@ -25,11 +24,7 @@ namespace MultiDiceGame
         {
             iPlayer = new Player();
             uPlayer = new Player();
-            diceImg = new Bitmap[6];
-            for (int i = 0; i < diceImg.Length; i++)
-            {
-                diceImg[i] = new Bitmap($@"Image/주사위{i + 1}.png");
-            }
+            
             /*Timer t_order = new Timer();
             t_order.Interval = 2000;
             t_order.Tick += t_order_Tick;
@@ -51,9 +46,14 @@ namespace MultiDiceGame
         private void btn_rollDice_Click(object sender, EventArgs e)
         {
             btn_rollDice.Enabled = false;
+            RollDice();
+        }
+
+        private void RollDice()
+        {
             rollDiceTimer = new Timer();
             rollDiceTimer.Tick += RollDiceTimer_Tick;
-            rollDiceTimer.Interval = 100;
+            rollDiceTimer.Interval = 90;
             rollDiceTimer.Start();
         }
 
@@ -63,12 +63,78 @@ namespace MultiDiceGame
             {
                 Game.RollVal++;
                 Random rand = new Random();
-                pbox_dice.Image = diceImg[rand.Next(6)];
+                Game.DiceVal = rand.Next(6) + 1;
+                pbox_dice.Image = Game.DiceImg[Game.DiceVal - 1];
             }
             else
             {
                 Game.RollVal = 0;
                 rollDiceTimer.Stop();
+                //btn_rollDice.Enabled = true;
+                MoveCharacter();
+            }
+        }
+
+        private void MoveCharacter()
+        {
+            moveCharTimer = new Timer();
+            moveCharTimer.Tick += MoveCharTimer_Tick;
+            moveCharTimer.Interval = 200;
+            moveCharTimer.Start();
+            iPlayer.IsShortPath = true;
+        }
+
+        private void MoveCharTimer_Tick(object sender, EventArgs e)
+        {
+            if (Game.DiceVal > 0)
+            {
+                Game.DiceVal--;
+                if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && iPlayer.IsShortPath)
+                {
+                    iPlayer.Y--;
+                    iPlayer.IsShortPath = false;
+                }
+                else if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && Game.Map[iPlayer.Y][iPlayer.X - 1] == 0 && Game.Map[iPlayer.Y][iPlayer.X + 1] == 0)
+                {
+
+                }
+                else if (iPlayer.Direction == Directions.Left)
+                {
+                    if (iPlayer.X > 0 && iPlayer.X <= 15)
+                    {
+                        iPlayer.X--;
+                    }
+                    else if (iPlayer.X == 0 && Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
+                    {
+                        iPlayer.Y--;
+                    }
+                    else
+                    {
+                        iPlayer.Direction = Directions.Right;
+                        Game.DiceVal++;
+                    }
+                }
+                else
+                {
+                    if (iPlayer.X >= 0 && iPlayer.X < 15)
+                    {
+                        iPlayer.X++;
+                    }
+                    else if (iPlayer.X == 15 && Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
+                    {
+                        iPlayer.Y--;
+                    }
+                    else
+                    {
+                        iPlayer.Direction = Directions.Left;
+                        Game.DiceVal++;
+                    }
+                }
+                Invalidate();
+            }
+            else
+            {
+                moveCharTimer.Stop();
                 btn_rollDice.Enabled = true;
             }
         }
@@ -79,10 +145,14 @@ namespace MultiDiceGame
             {
                 for (int j = 0; j < Game.Map[i].Length; j++)
                 {
-                    e.Graphics.FillRectangle(Brushes.Green, 50 + j * sz, 50 + i * sz, sz, sz);
-                    e.Graphics.DrawRectangle(Pens.Black, 50 + j * sz, 50 + i * sz, sz, sz);
+                    if (Game.Map[i][j] == 1)
+                    {
+                        e.Graphics.FillRectangle(Brushes.Green, 40 + j * Game.BlockSize, 40 + i * Game.BlockSize, Game.BlockSize, Game.BlockSize);
+                        e.Graphics.DrawRectangle(Pens.Black, 40 + j * Game.BlockSize, 40 + i * Game.BlockSize, Game.BlockSize, Game.BlockSize);
+                    }
                 }
             }
+            e.Graphics.DrawImage(Game.CharImg[0], 50 + iPlayer.X * Game.BlockSize, 40 + iPlayer.Y * Game.BlockSize, 40, 40);
         }
     }
 }
