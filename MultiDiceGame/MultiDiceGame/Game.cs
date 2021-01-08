@@ -18,13 +18,15 @@ namespace MultiDiceGame
         public static int BlockSize { get; set; } = 60;
         public static Bitmap[] DiceImg { get; set; }
         public static Bitmap[] CharImg { get; set; }
+        public static int MapRow { get; set; } = 13;
+        public static int MapCol { get; set; } = 16;
 
         static Game()
         {
-            Map = new int[13][];
+            Map = new int[MapRow][];
             for (int i = 0; i < Map.Length; i++)
             {
-                Map[i] = new int[16];
+                Map[i] = new int[MapCol];
             }
             LoadMap();
             DiceImg = new Bitmap[6];

@@ -59,7 +59,7 @@ namespace MultiDiceGame
 
         private void RollDiceTimer_Tick(object sender, EventArgs e)
         {
-            if (Game.RollVal < 20)
+            if (Game.RollVal < 1)
             {
                 Game.RollVal++;
                 Random rand = new Random();
@@ -70,7 +70,6 @@ namespace MultiDiceGame
             {
                 Game.RollVal = 0;
                 rollDiceTimer.Stop();
-                //btn_rollDice.Enabled = true;
                 MoveCharacter();
             }
         }
@@ -79,9 +78,10 @@ namespace MultiDiceGame
         {
             moveCharTimer = new Timer();
             moveCharTimer.Tick += MoveCharTimer_Tick;
-            moveCharTimer.Interval = 200;
+            moveCharTimer.Interval = 100;
             moveCharTimer.Start();
-            iPlayer.IsShortPath = true;
+            if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
+                iPlayer.IsShortPath = true;
         }
 
         private void MoveCharTimer_Tick(object sender, EventArgs e)
@@ -89,47 +89,91 @@ namespace MultiDiceGame
             if (Game.DiceVal > 0)
             {
                 Game.DiceVal--;
-                if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && iPlayer.IsShortPath)
+                if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && iPlayer.X == 0 || iPlayer.X == Game.MapCol - 1)
                 {
                     iPlayer.Y--;
-                    iPlayer.IsShortPath = false;
-                }
-                else if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && Game.Map[iPlayer.Y][iPlayer.X - 1] == 0 && Game.Map[iPlayer.Y][iPlayer.X + 1] == 0)
-                {
-
-                }
-                else if (iPlayer.Direction == Directions.Left)
-                {
-                    if (iPlayer.X > 0 && iPlayer.X <= 15)
+                   /* if (iPlayer.IsShortPath)
                     {
-                        iPlayer.X--;
-                    }
-                    else if (iPlayer.X == 0 && Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
+                        iPlayer.IsShortPath = false;
+                        iPlayer.Y--;
+
+                        if (iPlayer.Direction == Directions.Left || iPlayer.Direction == Directions.Right)
+                        {
+                            iPlayer.BeforeDirection = iPlayer.Direction;
+                            iPlayer.Direction = Directions.Up;
+                        }
+                    }*/
+                    /*else if (iPlayer.X == 0 || iPlayer.X == Game.MapCol - 1)
                     {
                         iPlayer.Y--;
                     }
-                    else
+                    else if (Game.Map[iPlayer.Y][iPlayer.X - 1] == 0 && Game.Map[iPlayer.Y][iPlayer.X + 1] == 0)
                     {
-                        iPlayer.Direction = Directions.Right;
-                        Game.DiceVal++;
+                        iPlayer.Y--;
+                    }*/
+                }
+                else if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && iPlayer.X > 0 && iPlayer.X < Game.MapCol - 1 && iPlayer.IsShortPath)
+                {
+                    iPlayer.Y--;
+
+                    if (iPlayer.Direction == Directions.Left || iPlayer.Direction == Directions.Right)
+                    {
+                        iPlayer.BeforeDirection = iPlayer.Direction;
+                        iPlayer.Direction = Directions.Up;
                     }
+                }
+                else if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && iPlayer.X > 0 && iPlayer.X < Game.MapCol - 1)
+                {
+                    iPlayer.Y--;
                 }
                 else
                 {
-                    if (iPlayer.X >= 0 && iPlayer.X < 15)
+                    if (iPlayer.Direction == Directions.Up || iPlayer.Direction == Directions.Down)
                     {
-                        iPlayer.X++;
+                        var temp = iPlayer.Direction;
+                        iPlayer.Direction = iPlayer.BeforeDirection;
+                        iPlayer.BeforeDirection = temp;
+
+                        if (iPlayer.Direction == Directions.Left)
+                            iPlayer.Direction = Directions.Right;
+                        else
+                            iPlayer.Direction = Directions.Left;
                     }
-                    else if (iPlayer.X == 15 && Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
+
+                    if (iPlayer.Direction == Directions.Left)
                     {
-                        iPlayer.Y--;
+                        if (iPlayer.X > 0 && iPlayer.X <= Game.MapCol - 1)
+                        {
+                            iPlayer.X--;
+                        }
+                        /*else if (iPlayer.X == 0 && Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
+                        {
+                            iPlayer.Y--;
+                        }*/
+                        else
+                        {
+                            iPlayer.Direction = Directions.Right;
+                            Game.DiceVal++;
+                        }
                     }
                     else
                     {
-                        iPlayer.Direction = Directions.Left;
-                        Game.DiceVal++;
+                        if (iPlayer.X >= 0 && iPlayer.X < Game.MapCol - 1)
+                        {
+                            iPlayer.X++;
+                        }
+                        /*else if (iPlayer.X == 15 && Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
+                        {
+                            iPlayer.Y--;
+                        }*/
+                        else
+                        {
+                            iPlayer.Direction = Directions.Left;
+                            Game.DiceVal++;
+                        }
                     }
                 }
+                iPlayer.IsShortPath = false;
                 Invalidate();
             }
             else
