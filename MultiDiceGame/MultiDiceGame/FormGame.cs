@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -13,7 +14,6 @@ namespace MultiDiceGame
     public partial class FormGame : Form
     {
         Player iPlayer, uPlayer;
-        Timer rollDiceTimer, moveCharTimer;
 
         public FormGame()
         {
@@ -24,11 +24,67 @@ namespace MultiDiceGame
         {
             iPlayer = new Player();
             uPlayer = new Player();
-            
-            /*Timer t_order = new Timer();
-            t_order.Interval = 2000;
-            t_order.Tick += t_order_Tick;
-            t_order.Start();*/
+
+            if (Player.User == User.Server)
+            {
+                Text = "Server";
+                Server.Receive(CallBack);
+            }
+            else
+            {
+                Text = "Client";
+                Client.Receive(CallBack);
+            }
+
+            if (Player.User == User.Server)
+            {
+                Thread thread = new Thread(() =>
+                {
+                    Thread.Sleep(1000);                 
+                    int[] orderValues = Game.SelectOrder();
+                    if (orderValues[0] == 0)
+                    {
+                        Server.SendToClient("#server");
+                        btn_rollDice.Enabled = true;
+                        lbl_turn.Text = "내 턴";
+                    }
+                    else
+                    {
+                        Server.SendToClient("#client");
+                        lbl_turn.Text = "상대 턴";
+                    }
+                });
+                thread.Start();
+            }                   
+        }
+
+        // 서버나 클라이언트 에서 데이터를 받으면 호출할 콜백함수
+        private void CallBack(string RcvMsg)
+        {
+            // 누구인지 설정
+            Player.Who = Who.U;
+
+            string[] msg = RcvMsg.Split('/');
+            if (msg[0] == "#btn_rollDice_Click")
+            {
+                Dice.Spots = new int[msg.Length - 1];
+                for (int i = 0; i < Dice.Spots.Length; i++)
+                {
+                    Dice.Spots[i] = int.Parse(msg[i + 1]);
+                }
+                Thread thread = new Thread(Start_btn_rollDice_Click);
+                thread.Start();                
+            }
+            else if (msg[0] == "#server")
+            {
+                //pbox_dice.Enabled = false;
+                lbl_turn.Text = "상대 턴";
+            }
+            else if (msg[0] == "#client")
+            {
+                btn_rollDice.Enabled = true;
+                lbl_turn.Text = "내 턴";
+            }
         }
 
         private void t_order_Tick(object sender, EventArgs e)
@@ -39,164 +95,85 @@ namespace MultiDiceGame
 
         private void FormGame_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //Owner.Show();
             Owner.Dispose();
         }
 
+        // 주사위 굴리기 버튼 클릭
         private void btn_rollDice_Click(object sender, EventArgs e)
         {
+            // 누구인지 설정
+            Player.Who = Who.I;
+
+            // 주사위 랜덤값 미리 정하기
+            Dice.Spots = new int[Dice.RollCount];
+            Random rand = new Random();
+            for (int i = 0; i < Dice.Spots.Length; i++)
+            {
+                Dice.Spots[i] = rand.Next(1, 7); // 1 ~ 6
+            }
+
+            // 스레드로 시작
+            Thread thread = new Thread(Start_btn_rollDice_Click);
+            thread.Start();
+
+            // 주사위 굴리기 버튼 클릭에 대한 정보를 전송
+            string msg = "#btn_rollDice_Click";
+            foreach (var v in Dice.Spots)
+            {
+                msg += "/" + v;
+            }
+            if (Player.User == User.Server)
+                Server.SendToClient(msg);
+            else
+                Client.SendToServer(msg);
+        }
+
+        // 주사위 굴리기 버튼이 클릭되었을 때 실행 할 쓰레드
+        private void Start_btn_rollDice_Click()
+        {
+            // 주사위 굴리기 버튼을 사용 불가로 함
             btn_rollDice.Enabled = false;
-            RollDice();
-        }
-
-        private void RollDice()
-        {
-            rollDiceTimer = new Timer();
-            rollDiceTimer.Tick += RollDiceTimer_Tick;
-            rollDiceTimer.Interval = 90;
-            rollDiceTimer.Start();
-        }
-
-        private void RollDiceTimer_Tick(object sender, EventArgs e)
-        {
-            if (Game.RollVal < 1)
+           
+            // 주사위를 굴림
+            Dice.Roll(ChangeDiceImage);
+            // 캐릭터를 움직임
+            if (Player.Who == Who.I)
             {
-                Game.RollVal++;
-                Random rand = new Random();
-                Game.DiceVal = rand.Next(6) + 1;
-                pbox_dice.Image = Game.DiceImg[Game.DiceVal - 1];
+                iPlayer.Move(CallBackInvalidate);
             }
             else
             {
-                Game.RollVal = 0;
-                rollDiceTimer.Stop();
-                MoveCharacter();
-            }
-        }
-
-        private void MoveCharacter()
-        {
-            moveCharTimer = new Timer();
-            moveCharTimer.Tick += MoveCharTimer_Tick;
-            moveCharTimer.Interval = 100;
-            moveCharTimer.Start();
-            if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
-                iPlayer.IsShortPath = true;
-        }
-
-        private void MoveCharTimer_Tick(object sender, EventArgs e)
-        {
-            if (Game.DiceVal > 0)
-            {
-                Game.DiceVal--;
-                if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && iPlayer.X == 0 || iPlayer.X == Game.MapCol - 1)
-                {
-                    iPlayer.Y--;
-                   /* if (iPlayer.IsShortPath)
-                    {
-                        iPlayer.IsShortPath = false;
-                        iPlayer.Y--;
-
-                        if (iPlayer.Direction == Directions.Left || iPlayer.Direction == Directions.Right)
-                        {
-                            iPlayer.BeforeDirection = iPlayer.Direction;
-                            iPlayer.Direction = Directions.Up;
-                        }
-                    }*/
-                    /*else if (iPlayer.X == 0 || iPlayer.X == Game.MapCol - 1)
-                    {
-                        iPlayer.Y--;
-                    }
-                    else if (Game.Map[iPlayer.Y][iPlayer.X - 1] == 0 && Game.Map[iPlayer.Y][iPlayer.X + 1] == 0)
-                    {
-                        iPlayer.Y--;
-                    }*/
-                }
-                else if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && iPlayer.X > 0 && iPlayer.X < Game.MapCol - 1 && iPlayer.IsShortPath)
-                {
-                    iPlayer.Y--;
-
-                    if (iPlayer.Direction == Directions.Left || iPlayer.Direction == Directions.Right)
-                    {
-                        iPlayer.BeforeDirection = iPlayer.Direction;
-                        iPlayer.Direction = Directions.Up;
-                    }
-                }
-                else if (Game.Map[iPlayer.Y - 1][iPlayer.X] == 1 && iPlayer.X > 0 && iPlayer.X < Game.MapCol - 1)
-                {
-                    iPlayer.Y--;
-                }
-                else
-                {
-                    if (iPlayer.Direction == Directions.Up || iPlayer.Direction == Directions.Down)
-                    {
-                        var temp = iPlayer.Direction;
-                        iPlayer.Direction = iPlayer.BeforeDirection;
-                        iPlayer.BeforeDirection = temp;
-
-                        if (iPlayer.Direction == Directions.Left)
-                            iPlayer.Direction = Directions.Right;
-                        else
-                            iPlayer.Direction = Directions.Left;
-                    }
-
-                    if (iPlayer.Direction == Directions.Left)
-                    {
-                        if (iPlayer.X > 0 && iPlayer.X <= Game.MapCol - 1)
-                        {
-                            iPlayer.X--;
-                        }
-                        /*else if (iPlayer.X == 0 && Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
-                        {
-                            iPlayer.Y--;
-                        }*/
-                        else
-                        {
-                            iPlayer.Direction = Directions.Right;
-                            Game.DiceVal++;
-                        }
-                    }
-                    else
-                    {
-                        if (iPlayer.X >= 0 && iPlayer.X < Game.MapCol - 1)
-                        {
-                            iPlayer.X++;
-                        }
-                        /*else if (iPlayer.X == 15 && Game.Map[iPlayer.Y - 1][iPlayer.X] == 1)
-                        {
-                            iPlayer.Y--;
-                        }*/
-                        else
-                        {
-                            iPlayer.Direction = Directions.Left;
-                            Game.DiceVal++;
-                        }
-                    }
-                }
-                iPlayer.IsShortPath = false;
-                Invalidate();
-            }
-            else
-            {
-                moveCharTimer.Stop();
+                uPlayer.Move(CallBackInvalidate);
+                // 주사위 굴리기 버튼을 사용 가능하게 함
                 btn_rollDice.Enabled = true;
-            }
+            }            
         }
+
+        private void ChangeDiceImage(Bitmap image)
+        {
+            pbox_dice.Image = image;
+        }
+
+        private void CallBackInvalidate()
+        {
+            Invalidate();
+        }      
 
         private void FormGame_Paint(object sender, PaintEventArgs e)
         {
-            for (int i = 0; i < Game.Map.Length; i++)
+            for (int i = 1; i < Board.Map.Length - 1; i++)
             {
-                for (int j = 0; j < Game.Map[i].Length; j++)
+                for (int j = 1; j < Board.Map[i].Length - 1; j++)
                 {
-                    if (Game.Map[i][j] == 1)
+                    if (Board.Map[i][j] == 1)
                     {
-                        e.Graphics.FillRectangle(Brushes.Green, 40 + j * Game.BlockSize, 40 + i * Game.BlockSize, Game.BlockSize, Game.BlockSize);
-                        e.Graphics.DrawRectangle(Pens.Black, 40 + j * Game.BlockSize, 40 + i * Game.BlockSize, Game.BlockSize, Game.BlockSize);
+                        e.Graphics.FillRectangle(Brushes.Green, 40 + (j - 1) * Board.BlockSize, 40 + (i - 1) * Board.BlockSize, Board.BlockSize, Board.BlockSize);
+                        e.Graphics.DrawRectangle(Pens.Black, 40 + (j - 1) * Board.BlockSize, 40 + (i - 1) * Board.BlockSize, Board.BlockSize, Board.BlockSize);
                     }
                 }
             }
-            e.Graphics.DrawImage(Game.CharImg[0], 50 + iPlayer.X * Game.BlockSize, 40 + iPlayer.Y * Game.BlockSize, 40, 40);
+            e.Graphics.DrawImage(Player.Image[1], 50 + (uPlayer.X - 1) * Board.BlockSize, 60 + (uPlayer.Y - 1) * Board.BlockSize, 40, 40);
+            e.Graphics.DrawImage(Player.Image[0], 50 + (iPlayer.X - 1) * Board.BlockSize, 40 + (iPlayer.Y - 1) * Board.BlockSize, 40, 40);
         }
     }
 }

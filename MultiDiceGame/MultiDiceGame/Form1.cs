@@ -20,9 +20,9 @@ namespace MultiDiceGame
 
         private void FormMain_Load(object sender, EventArgs e)
         {
-            FormGame formGame = new FormGame();
+            /*FormGame formGame = new FormGame();
             formGame.Owner = this;
-            formGame.Show();
+            formGame.Show();*/
         }
 
         private void btn_openServer_Click(object sender, EventArgs e)
@@ -35,6 +35,7 @@ namespace MultiDiceGame
         {
             Client.ConnectServer();
             FormGame formGame = new FormGame();
+            Player.User = User.Client;
             formGame.Owner = this;
             formGame.Show();
         }

@@ -14,6 +14,7 @@ namespace MultiDiceGame
         private static Socket server;
         private static Socket client;
         public static bool IsOpen { get; set; }
+        public static string RcvMsg { get; set; }
 
         public static void OpenServer()
         {
@@ -34,29 +35,47 @@ namespace MultiDiceGame
         {
             // 클라이언트의 연결 수락
             client = await Task.Factory.FromAsync(server.BeginAccept, server.EndAccept, null);
-            //MessageBox.Show("수락완료");
 
             // 수락 후 게임폼 열기
             FormGame formGame = new FormGame();
+            Player.User = User.Server;
             formGame.Owner = form;
             formGame.Show();
-
-            // 클라이언트로 부터 데이터를 받기위해 비동기로 대기
-            byte[] rcvData = new byte[1000];
-            await Task.Factory.FromAsync(
-                server.BeginReceive(rcvData, 0, rcvData.Length, SocketFlags.None, null, null),
-                server.EndReceive);
         }
 
-        public static async void SendToClient<T>(T data_)
+        public static async void Receive(Action<string> callBack)
+        {
+            // 클라이언트로 부터 데이터를 받기위해 비동기로 대기
+            while (true)
+            {
+                byte[] rcvData = new byte[1000];
+                var length = await Task.Factory.FromAsync(
+                    client.BeginReceive(rcvData, 0, rcvData.Length, SocketFlags.None, null, null),
+                    client.EndReceive);
+                RcvMsg = Encoding.UTF8.GetString(rcvData, 0, length);
+                callBack(RcvMsg);
+            }
+        }
+
+        public static async void SendToClient<T>(T _msg)
         {
             // 클라이언트로 데이터를 전송
-            dynamic data = data_;
-            byte[] sendData = Encoding.UTF8.GetBytes(data);
+            dynamic msg = _msg;
+            byte[] sendData = Encoding.UTF8.GetBytes(msg);
             await Task.Factory.FromAsync(
                 client.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, null, null),
                 client.EndSend);
         }
+
+        /*public static async void SendToMe<T>(T _msg)
+        {
+            // 클라이언트로 데이터를 전송
+            dynamic msg = _msg;
+            byte[] sendData = Encoding.UTF8.GetBytes(msg);
+            await Task.Factory.FromAsync(
+                server.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, null, null),
+                server.EndSend);
+        }*/
 
         public static void Close()
         {
