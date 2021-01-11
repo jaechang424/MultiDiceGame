@@ -33,7 +33,7 @@ namespace MultiDiceGame
                 Text = "Server";
                 foreach (var client in Server.Clients)
                 {
-                    task = Server.Receive(client, CallBackServer);
+                    Server.Receive(client, CallBackServer);
                 }
                 for (int i = 0; i < Server.Clients.Count; i++)
                 {
@@ -85,7 +85,7 @@ namespace MultiDiceGame
                     msg += "/" + rand.Next(1, 7); // 1 ~ 6
                 }
                 
-                for (int i = 0; i < Dice.Spots.Length; i++)
+                for (int i = 0; i < Server.Clients.Count; i++)
                 {
                     if (Server.Id == i)
                     {
@@ -111,7 +111,7 @@ namespace MultiDiceGame
             
             if (msg.IndexOf('$') == 0) // $가 인덱스 0번째에서 발견 되었을 경우
             {
-                Client.Id = msg[1];
+                Client.Id = int.Parse(msg[1].ToString());
             }
             else if (msg == "#btn_rollDice_Click")
             {
@@ -125,7 +125,7 @@ namespace MultiDiceGame
             }
             else if (msg == "#first")
             {
-                pbox_dice.Enabled = true;
+                btn_rollDice.Enabled = true;
                 lbl_turn.Text = "내 턴";
             }
             else if (msg == "#second")
@@ -139,18 +139,12 @@ namespace MultiDiceGame
                 Thread thread = new Thread(Start_btn_rollDice_Click);
                 thread.Start();
             }
-            else if (msg == "#btn_rollDice_Click#I")
+            else if (msg == "#btn_rollDice_Click#U")
             {
                 Player.Who = Who.U;
                 Thread thread = new Thread(Start_btn_rollDice_Click);
                 thread.Start();
             }
-        }
-
-        private void t_order_Tick(object sender, EventArgs e)
-        {
-            //int[] orderValues = Game.SelectOrder();
-            //Server.SendToClient(orderValues);
         }
 
         private void FormGame_FormClosing(object sender, FormClosingEventArgs e)

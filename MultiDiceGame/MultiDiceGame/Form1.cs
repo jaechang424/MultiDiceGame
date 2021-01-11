@@ -27,8 +27,14 @@ namespace MultiDiceGame
 
         private void btn_openServer_Click(object sender, EventArgs e)
         {
+            // 서버 열기
             Server.OpenServer();
+
+            // 클라이언트의 연결 요청을 비동기로 수락
             Server.AcceptClient(this);
+
+            // 나 자신도 클라이언트 로써 서버에 연결
+            Client.ConnectServer();           
         }
 
         private void btn_connectServer_Click(object sender, EventArgs e)

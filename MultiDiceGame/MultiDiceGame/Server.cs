@@ -32,17 +32,17 @@ namespace MultiDiceGame
             server.Listen(2);
         }
 
-        public static async void AcceptClient(Form form)
+        public static async void AcceptClient(FormMain form)
         {
-            // 클라이언트의 연결 수락
-            var client = await Task.Factory.FromAsync(server.BeginAccept, server.EndAccept, null);
-
-            // 리스트에 클라이언트 추가
             Clients = new List<Socket>();
-            Clients.Add(client);
+            while (Clients.Count < 2)
+            {
+                // 클라이언트의 연결 수락
+                var client = await Task.Factory.FromAsync(server.BeginAccept, server.EndAccept, null);
 
-            // 나 자신도 클라이언트 로써 서버에 연결
-            Client.ConnectServer();
+                // 리스트에 클라이언트 추가                
+                Clients.Add(client);
+            }
 
             // 수락 후 게임폼 열기
             FormGame formGame = new FormGame();
@@ -51,7 +51,7 @@ namespace MultiDiceGame
             formGame.Show();
         }
 
-        public static async Task Receive(Socket client, Action<string> callBack)
+        public static async void Receive(Socket client, Action<string> callBack)
         {
             // 클라이언트로 부터 데이터를 받기위해 비동기로 대기
             while (true)
