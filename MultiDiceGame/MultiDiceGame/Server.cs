@@ -12,9 +12,10 @@ namespace MultiDiceGame
     class Server
     {
         private static Socket server;
-        private static Socket client;
+        public static List<Socket> Clients { get; set; }
+        public static int Id { get; set; }
         public static bool IsOpen { get; set; }
-        public static string RcvMsg { get; set; }
+        public static string RcvMsg { get; set; }       
 
         public static void OpenServer()
         {
@@ -28,13 +29,20 @@ namespace MultiDiceGame
             server.Bind(ep);
 
             // 클라이언트의 연결 대기
-            server.Listen(1);
+            server.Listen(2);
         }
 
         public static async void AcceptClient(Form form)
         {
             // 클라이언트의 연결 수락
-            client = await Task.Factory.FromAsync(server.BeginAccept, server.EndAccept, null);
+            var client = await Task.Factory.FromAsync(server.BeginAccept, server.EndAccept, null);
+
+            // 리스트에 클라이언트 추가
+            Clients = new List<Socket>();
+            Clients.Add(client);
+
+            // 나 자신도 클라이언트 로써 서버에 연결
+            Client.ConnectServer();
 
             // 수락 후 게임폼 열기
             FormGame formGame = new FormGame();
@@ -43,7 +51,7 @@ namespace MultiDiceGame
             formGame.Show();
         }
 
-        public static async void Receive(Action<string> callBack)
+        public static async Task Receive(Socket client, Action<string> callBack)
         {
             // 클라이언트로 부터 데이터를 받기위해 비동기로 대기
             while (true)
@@ -57,7 +65,7 @@ namespace MultiDiceGame
             }
         }
 
-        public static async void SendToClient<T>(T _msg)
+        public static async void SendToClient<T>(Socket client, T _msg)
         {
             // 클라이언트로 데이터를 전송
             dynamic msg = _msg;
@@ -66,16 +74,6 @@ namespace MultiDiceGame
                 client.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, null, null),
                 client.EndSend);
         }
-
-        /*public static async void SendToMe<T>(T _msg)
-        {
-            // 클라이언트로 데이터를 전송
-            dynamic msg = _msg;
-            byte[] sendData = Encoding.UTF8.GetBytes(msg);
-            await Task.Factory.FromAsync(
-                server.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, null, null),
-                server.EndSend);
-        }*/
 
         public static void Close()
         {

@@ -40,6 +40,11 @@ namespace MultiDiceGame
             formGame.Show();
         }
 
+        private void CallBack(string RcvMsg)
+        {
+
+        }
+
         private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             Server.Close();

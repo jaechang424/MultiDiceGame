@@ -13,6 +13,7 @@ namespace MultiDiceGame
     {
         private static Socket client;
         public static string RcvMsg { get; set; }
+        public static int Id { get; set; }
         public static void ConnectServer()
         {
             // 소켓 객체 생성 (TCP 소켓)
@@ -50,7 +51,7 @@ namespace MultiDiceGame
         {
             // 클라이언트로 데이터를 전송
             dynamic msg = _msg;
-            byte[] sendData = Encoding.UTF8.GetBytes(msg);
+            byte[] sendData = Encoding.UTF8.GetBytes($"{msg}/{Id}");
             await Task.Factory.FromAsync(
                 client.BeginSend(sendData, 0, sendData.Length, SocketFlags.None, null, null),
                 client.EndSend);
