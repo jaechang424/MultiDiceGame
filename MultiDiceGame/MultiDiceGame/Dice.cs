@@ -11,7 +11,7 @@ namespace MultiDiceGame
     class Dice
     {
         public static int RollValue { get; set; } // dice
-        public static int RollCount { get; set; } = 1; // dice
+        public static int RollCount { get; set; } = 10; // dice
         public static int Spot { get; set; } // dice
         public static int[] Spots { get; set; }
 
@@ -33,7 +33,7 @@ namespace MultiDiceGame
             {
                 Spot = Spots[i];
                 ChangeDiceImage(Image[Spot - 1]);
-                Thread.Sleep(100);
+                Thread.Sleep(60);
             }
         }       
     }

@@ -95,8 +95,7 @@ namespace MultiDiceGame
                     {
                         Server.SendToClient(Server.Clients[i], "#btn_rollDice_Click#U" + msg);
                     }
-                }
-                
+                }               
             }
         }
 
@@ -113,16 +112,6 @@ namespace MultiDiceGame
             {
                 Client.Id = int.Parse(msg[1].ToString());
             }
-            else if (msg == "#btn_rollDice_Click")
-            {
-                Dice.Spots = new int[msgs.Length - 1];
-                for (int i = 0; i < Dice.Spots.Length; i++)
-                {
-                    Dice.Spots[i] = int.Parse(msgs[i + 1]);
-                }
-                Thread thread = new Thread(Start_btn_rollDice_Click);
-                thread.Start();                
-            }
             else if (msg == "#first")
             {
                 btn_rollDice.Enabled = true;
@@ -133,15 +122,18 @@ namespace MultiDiceGame
                 btn_rollDice.Enabled = false;
                 lbl_turn.Text = "상대 턴";
             }
-            else if (msg == "#btn_rollDice_Click#I")
+            else if (msg.IndexOf("#btn_rollDice_Click") == 0)
             {
-                Player.Who = Who.I;
-                Thread thread = new Thread(Start_btn_rollDice_Click);
-                thread.Start();
-            }
-            else if (msg == "#btn_rollDice_Click#U")
-            {
-                Player.Who = Who.U;
+                if (msg == "#btn_rollDice_Click#I")
+                    Player.Who = Who.I;
+                else
+                    Player.Who = Who.U;
+
+                Dice.Spots = new int[msgs.Length - 1];
+                for (int i = 0; i < Dice.Spots.Length; i++)
+                {
+                    Dice.Spots[i] = int.Parse(msgs[i + 1]);
+                }
                 Thread thread = new Thread(Start_btn_rollDice_Click);
                 thread.Start();
             }
@@ -154,53 +146,63 @@ namespace MultiDiceGame
 
         // 주사위 굴리기 버튼 클릭
         private void btn_rollDice_Click(object sender, EventArgs e)
-        {
-            /*// 누구인지 설정
-            Player.Who = Who.I;
-
-            // 주사위 랜덤값 미리 정하기
-            Dice.Spots = new int[Dice.RollCount];
-            Random rand = new Random();
-            for (int i = 0; i < Dice.Spots.Length; i++)
-            {
-                Dice.Spots[i] = rand.Next(1, 7); // 1 ~ 6
-            }
-
-            // 스레드로 시작
-            Thread thread = new Thread(Start_btn_rollDice_Click);
-            thread.Start();*/
-
+        {          
             // 주사위 굴리기 버튼 클릭에 대한 정보를 전송
-            string msg = "#btn_rollDice_Click";
-            /*foreach (var v in Dice.Spots)
-            {
-                msg += "/" + v;
-            }*/
-            Client.SendToServer(msg);
-            /*if (Player.User == User.Server)
-                Server.SendToClient(msg);
-            else
-                Client.SendToServer(msg);*/
+            Client.SendToServer("#btn_rollDice_Click");
         }
 
         // 주사위 굴리기 버튼이 클릭되었을 때 실행 할 쓰레드
         private void Start_btn_rollDice_Click()
         {
             // 주사위 굴리기 버튼을 사용 불가로 함
-            btn_rollDice.Enabled = false;
-           
+            // 다른 쓰레드에서 컨트롤에 접근 시 크로스 스레드 에러 발생에 대한 대비
+            if (InvokeRequired)
+            {
+                Invoke(new MethodInvoker(() =>
+                {
+                    btn_rollDice.Enabled = false;
+                }));
+            }
+            else
+            {
+                btn_rollDice.Enabled = false;
+            }
+
             // 주사위를 굴림
             Dice.Roll(ChangeDiceImage);
             // 캐릭터를 움직임
             if (Player.Who == Who.I)
             {
                 iPlayer.Move(CallBackInvalidate);
+                if (InvokeRequired)
+                {
+                    Invoke(new MethodInvoker(() =>
+                    {
+                        lbl_turn.Text = "상대 턴";
+                    }));
+                }
+                else
+                {
+                    lbl_turn.Text = "상대 턴";
+                }
             }
             else
             {
                 uPlayer.Move(CallBackInvalidate);
                 // 주사위 굴리기 버튼을 사용 가능하게 함
-                btn_rollDice.Enabled = true;
+                if (InvokeRequired)
+                {
+                    Invoke(new MethodInvoker(() =>
+                    {
+                        btn_rollDice.Enabled = true;
+                        lbl_turn.Text = "내 턴";
+                    }));
+                }
+                else
+                {
+                    btn_rollDice.Enabled = true;
+                    lbl_turn.Text = "내 턴";
+                }
             }            
         }
 
